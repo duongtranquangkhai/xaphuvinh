@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xã Phú Vinh</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Hiệu ứng nền */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(26, 35, 126, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 152, 0, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 50% 50%, rgba(76, 175, 80, 0.05) 0%, transparent 30%);
+            z-index: -1;
+        }
+        
+        .floating-bg {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+        
+        .floating-bg div {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float-bg 20s infinite linear;
+        }
+        
+        .floating-bg div:nth-child(1) {
+            width: 80px;
+            height: 80px;
+            top: 10%;
+            left: 10%;
+            background: rgba(26, 35, 126, 0.1);
+            animation-delay: 0s;
+        }
+        
+        .floating-bg div:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 70%;
+            left: 80%;
+            background: rgba(255, 152, 0, 0.1);
+            animation-delay: -5s;
+        }
+        
+        .floating-bg div:nth-child(3) {
+            width: 60px;
+            height: 60px;
+            top: 20%;
+            left: 85%;
+            background: rgba(76, 175, 80, 0.1);
+            animation-delay: -10s;
+        }
+        
+        .floating-bg div:nth-child(4) {
+            width: 100px;
+            height: 100px;
+            top: 80%;
+            left: 15%;
+            background: rgba(233, 30, 99, 0.1);
+            animation-delay: -15s;
+        }
+        
+        @keyframes float-bg {
+            0%, 100% {
+                transform: translateY(0) translateX(0);
+            }
+            25% {
+                transform: translateY(-20px) translateX(10px);
+            }
+            50% {
+                transform: translateY(10px) translateX(-10px);
+            }
+            75% {
+                transform: translateY(-10px) translateX(-20px);
+            }
+        }
+        
+        .postcard-container {
+            width: 100%;
+            max-width: 1000px;
+            perspective: 1500px;
+            margin: 20px auto;
+        }
+        
+        .postcard {
+            background-color: #fff;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 
+                0 30px 60px rgba(0, 0, 0, 0.2),
+                0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .postcard:hover {
+            transform: rotateY(5deg) rotateX(3deg) scale(1.02);
+            box-shadow: 
+                0 40px 80px rgba(0, 0, 0, 0.25),
+                0 0 30px rgba(26, 35, 126, 0.1);
+        }
+        
+        .postcard-header {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 50%, #3949ab 100%);
+            color: white;
+            padding: 30px 35px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .postcard-header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+            animation: shine 3s infinite linear;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .postcard-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            letter-spacing: 0.5px;
+            line-height: 1.4;
+        }
+        
+        .postcard-subtitle {
+            font-size: 17px;
+            opacity: 0.9;
+            font-weight: 300;
+            position: relative;
+            z-index: 2;
+            max-width: 100%;
+        }
+        
+        .postcard-body {
+            display: flex;
+            flex-wrap: wrap;
+            min-height: 500px;
+        }
+        
+        .postcard-image-section {
+            flex: 1;
+            min-width: 350px;
+            background: linear-gradient(rgba(26, 35, 126, 0.05), rgba(26, 35, 126, 0.1));
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+        
+        .main-image {
+            height: 220px;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.5s ease;
+            background: #f5f5f5;
+        }
+        
+        .main-image:hover {
+            transform: scale(1.03);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+        }
+        
+        .map-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #e8f5e9;
+        }
+        
+        .map-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        #hue-map {
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+        }
+        
+        .map-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 10;
+        }
+        
+        .map-label-box {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(26, 35, 126, 0.9);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            pointer-events: auto;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .map-label-box:hover {
+            background: rgba(26, 35, 126, 1);
+            transform: translateX(-50%) scale(1.05);
+        }
+        
+        .image-caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            transform: translateY(100%);
+            transition: transform 0.5s ease;
+            text-align: center;
+            z-index: 20;
+        }
+        
+        .main-image:hover .image-caption {
+            transform: translateY(0);
+        }
+        
+        /* Phần còn lại của CSS giữ nguyên... */
+
+        .identifiers-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .identifier-card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
+            cursor: pointer;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .identifier-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+        
+        .identifier-img {
+            height: 100px;
+            width: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .identifier-card:hover .identifier-img {
+            transform: scale(1.1);
+        }
+        
+        .identifier-title {
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a237e;
+            text-align: center;
+            background: rgba(26, 35, 126, 0.05);
+        }
+        
+        .postcard-content {
+            flex: 1.5;
+            min-width: 350px;
+            padding: 30px;
+        }
+        
+        .resolution-info {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px dashed #e0e0e0;
+            position: relative;
+        }
+        
+        .resolution-info::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: url("data:image/svg+xml,%3Csvg width='20' height='10' viewBox='0 0 20 10' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,5 Q5,0 10,5 T20,5' stroke='%231a237e' stroke-width='1' fill='none'/%3E%3C/svg%3E") repeat-x;
+            opacity: 0.5;
+        }
+        
+        .resolution-title {
+            color: #1a237e;
+            font-size: 22px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        
+        .resolution-title i {
+            margin-right: 12px;
+            color: #ff9800;
+            font-size: 24px;
+            text-shadow: 0 2px 5px rgba(255, 152, 0, 0.3);
+        }
+        
+        .resolution-detail {
+            font-size: 16px;
+            line-height: 1.7;
+            color: #444;
+            text-align: justify;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transform: translateY(0);
+            transition: transform 0.4s ease;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .table-container:hover {
+            transform: translateY(-5px);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+        }
+        
+        th {
+            background: linear-gradient(to right, #1a237e, #283593);
+            color: white;
+            font-weight: 600;
+            padding: 18px 15px;
+            text-align: left;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        td {
+            padding: 18px 15px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        tr:hover {
+            background-color: #f0f2ff;
+        }
+        
+        .highlight {
+            color: #1a237e;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .highlight::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, #ff9800, #ff5722);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.3s ease;
+        }
+        
+        tr:hover .highlight::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+        
+        .cultural-value {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 6px solid #ff9800;
+            margin-top: 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(255, 152, 0, 0.1);
+            transition: transform 0.4s ease;
+        }
+        
+        .cultural-value:hover {
+            transform: translateY(-5px);
+        }
+        
+        .cultural-value::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 1px, transparent 1px);
+            background-size: 30px 30px;
+            opacity: 0.5;
+            animation: float 25s linear infinite;
+        }
+        
+        .cultural-value h3 {
+            color: #1a237e;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .cultural-value h3 i {
+            margin-right: 12px;
+            color: #ff5722;
+            font-size: 24px;
+        }
+        
+        .cultural-value p {
+            line-height: 1.8;
+            color: #5d4037;
+            position: relative;
+            z-index: 2;
+            font-size: 16px;
+        }
+        
+        /* ĐÃ XÓA PHẦN FOOTER */
+        
+        /* Responsive cho điện thoại */
+        @media (max-width: 900px) {
+            .postcard-body {
+                flex-direction: column;
+            }
+            
+            .postcard-image-section {
+                min-height: auto;
+            }
+            
+            .postcard-title {
+                font-size: 24px;
+            }
+            
+            .postcard-content {
+                padding: 25px;
+            }
+            
+            .postcard-header {
+                padding: 25px;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .identifiers-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .postcard-title {
+                font-size: 22px;
+            }
+            
+            .postcard-subtitle {
+                font-size: 16px;
+            }
+            
+            .resolution-title {
+                font-size: 20px;
+            }
+            
+            .postcard-image-section {
+                padding: 20px;
+            }
+            
+            .main-image {
+                height: 200px;
+            }
+            
+            table {
+                min-width: 400px;
+            }
+            
+            th, td {
+                padding: 12px 10px;
+                font-size: 14px;
+            }
+            
+            .cultural-value {
+                padding: 20px;
+            }
+            
+            body {
+                padding: 10px;
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .postcard-title {
+                font-size: 20px;
+            }
+            
+            .postcard-header {
+                padding: 20px;
+            }
+            
+            .postcard-image-section, .postcard-content {
+                padding: 15px;
+            }
+            
+            .main-image {
+                height: 180px;
+            }
+            
+            .identifier-img {
+                height: 80px;
+            }
+        }
+        
+        /* Hiệu ứng cho các phần tử khi xuất hiện */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Hiệu ứng cho biểu tượng */
+        .floating-icon {
+            position: absolute;
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.8);
+            z-index: 1;
+            animation: float-icon 8s infinite ease-in-out;
+            filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.2));
+        }
+        
+        .icon-1 { top: 15%; left: 10%; animation-delay: 0s; }
+        .icon-2 { top: 65%; left: 85%; animation-delay: 1s; }
+        .icon-3 { top: 80%; left: 15%; animation-delay: 2s; }
+        .icon-4 { top: 25%; left: 80%; animation-delay: 3s; }
+        
+        @keyframes float-icon {
+            0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+            25% { transform: translateY(-15px) rotate(5deg) scale(1.1); }
+            50% { transform: translateY(5px) rotate(-5deg) scale(1.05); }
+            75% { transform: translateY(-10px) rotate(3deg) scale(1.08); }
+        }
+        
+        /* Hiệu ứng cho bảng */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); }
+            50% { box-shadow: 0 10px 25px rgba(26, 35, 126, 0.15); }
+            100% { box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); }
+        }
+        
+        /* Hiệu ứng cho card văn hóa */
+        .glow {
+            animation: glow 3s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 10px 25px rgba(255, 152, 0, 0.1); }
+            to { box-shadow: 0 10px 35px rgba(255, 152, 0, 0.3); }
+        }
+        
+        /* Tối ưu cho cảm ứng trên mobile */
+        .identifier-card,
+        .table-container {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        /* Cải thiện khả năng đọc trên mobile */
+        @media (max-width: 768px) {
+            .resolution-detail,
+            .cultural-value p {
+                font-size: 15px;
+                line-height: 1.6;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    <div class="floating-bg">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+    </div>
+    
+    <div class="postcard-container">
+        <div class="postcard">
+            <div class="postcard-header">
+                <div class="floating-icon icon-1"><i class="fas fa-landmark"></i></div>
+                <div class="floating-icon icon-2"><i class="fas fa-map-marked-alt"></i></div>
+                <div class="floating-icon icon-3"><i class="fas fa-flag"></i></div>
+                <div class="floating-icon icon-4"><i class="fas fa-history"></i></div>
+                
+                <h1 class="postcard-title animate-on-scroll">Xã Phú Vinh</h1>
+            </div>
+            
+            <div class="postcard-body">
+                <div class="postcard-image-section">
+                    <div class="main-image animate-on-scroll">
+                        <div class="map-container">
+                            <div class="map-frame">
+                                <!-- Bản đồ Google Maps sẽ được tạo ở đây -->
+                                <div class="map-preview">
+                                    <iframe 
+                                        src="https://www.google.com/maps?q=Xã%20Phú%20Vinh,%20Thành%20phố%20Huế&output=embed"
+                                        width="100%"
+                                        height="100%"
+                                        style="border:0;"
+                                        allowfullscreen=""
+                                        loading="lazy"
+                                        referrerpolicy="no-referrer-when-downgrade">
+                                    </iframe>
+                                </div> 
+                                <div id="hue-map"></div>
+                                <div class="map-overlay">
+                                    <div class="map-label-box">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>Xã Phú Vinh</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="resolution-title"><i class="fas fa-images"></i> Dấu hiệu nhận diện đặc trưng</h3>
+                    
+                    <div class="identifiers-grid">
+                        <div class="identifier-card animate-on-scroll">
+                            <img src="https://cdnphoto.dantri.com.vn/v9LqhoVkEeDXgnA6UKTELaU7VIM=/thumb_w/1920/2024/03/17/thap-cham-co-doc-dao-tung-nam-sau-trong-cat-giu-2-ky-luc-2-edited-1710653539225.jpeg" alt="Tháp Chăm Phú Diên " class="identifier-img" loading="lazy">
+                            <div class="identifier-title">Tháp Chăm Phú Diên </div>
+                        </div>
+
+                        <div class="identifier-card animate-on-scroll">
+                            <img src="https://huesmiletravel.com.vn/wp-content/uploads/2024/11/an-bang-1.png" alt="Thành phố Lăng mộ An Bằng" class="identifier-img" loading="lazy">
+                            <div class="identifier-title">Thành phố Lăng mộ An Bằng</div>
+                        </div>
+
+                        <div class="identifier-card animate-on-scroll">
+                            <img src="https://api.sovaba.travel/uploads/quan_the_di_tich_co_do_hue_15c1db7160.jpg" alt="Di tích lịch sử" class="identifier-img" loading="lazy">
+                            <div class="identifier-title">Di tích lịch sử Huế</div>
+                        </div>
+                        
+                        <div class="identifier-card animate-on-scroll">
+                            <img src="https://images.vietnamtourism.gov.vn/vn//images/2023/thang_8/2908.du-lich_tth.jpg" alt="Cảnh quan thiên nhiên" class="identifier-img" loading="lazy">
+                            <div class="identifier-title">Cảnh quan thiên nhiên</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="postcard-content">
+                    <div class="resolution-info">
+                        
+                    </div>
+                    
+                    <h2 class="resolution-title animate-on-scroll"><i class="fas fa-table"></i> Sắp xếp đơn vị hành chính</h2>
+                    <div class="table-container pulse animate-on-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Xã, phường trước sắp xếp</th>
+                                    <th>Xã/phường sau sắp xếp</th>
+                                    <th>Dấu hiệu nhận diện và giá trị văn hóa đặc trưng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Xã Phú Diên, Vinh Xuân, Vinh An và Vinh Thanh</td>
+                                    <td><span class="highlight">Phú Vinh</span></td>
+                                    <td>
+                                        <ul style="padding-left: 20px; margin: 0;">
+                                            <li>Tháp Chăm Phú Diên </li>
+                                            <li>Thành phố Lăng mộ An Bằng</li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="cultural-value glow animate-on-scroll">
+                        <h3><i class="fas fa-landmark-flag"></i>Tháp Chăm Phú Diên</h3>
+                        <p>Được phát hiện khảo cổ năm 2001. Ngôi tháp gạch Champa cổ (thế kỷ VIII) bị vùi sâu dưới cồn cát ven biển hàng thế kỷ. </p>
+                    </div>
+                    <div class="cultural-value glow animate-on-scroll">
+                        <h3><i class="fas fa-landmark-flag"></i>Thành phố Lăng mộ An Bằng</h3>
+                        <p>Khu nghĩa trang này nổi tiếng toàn cầu. Hàng nghìn ngôi mộ được xây dựng cầu kỳ, kiến trúc độc đáo, chi phí xây dựng lên tới hàng tỷ đồng.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ĐÃ XÓA TOÀN BỘ PHẦN FOOTER -->
+            
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Khởi tạo Google Maps
+            function initMap() {
+                // Tọa độ thành phố Huế
+                const hueLocation = { lat: 16.4637, lng: 107.5909 };
+                
+                // Tạo bản đồ
+                const map = new google.maps.Map(document.getElementById('hue-map'), {
+                    zoom: 12,
+                    center: hueLocation,
+                    mapTypeId: 'roadmap',
+                    styles: [
+                        {
+                            featureType: "all",
+                            elementType: "labels.text.fill",
+                            stylers: [{ color: "#1a237e" }]
+                        },
+                        {
+                            featureType: "water",
+                            elementType: "geometry",
+                            stylers: [{ color: "#c3cfe2" }]
+                        },
+                        {
+                            featureType: "road",
+                            elementType: "geometry",
+                            stylers: [{ color: "#f5f5f5" }]
+                        },
+                        {
+                            featureType: "road.highway",
+                            elementType: "geometry",
+                            stylers: [{ color: "#e0e0e0" }]
+                        }
+                    ],
+                    disableDefaultUI: true,
+                    zoomControl: true,
+                    mapTypeControl: false,
+                    scaleControl: true,
+                    streetViewControl: false,
+                    rotateControl: false,
+                    fullscreenControl: false
+                });
+                
+                // Thêm marker cho Huế
+                const marker = new google.maps.Marker({
+                    position: hueLocation,
+                    map: map,
+                    title: 'Thành phố Huế',
+                    animation: google.maps.Animation.DROP,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: 10,
+                        fillColor: "#FF0000",
+                        fillOpacity: 1,
+                        strokeColor: "#FFFFFF",
+                        strokeWeight: 2
+                    }
+                });
+                
+                // Thêm info window
+                const infoWindow = new google.maps.InfoWindow({
+                    content: `
+                        <div style="padding: 10px; max-width: 200px;">
+                            <h3 style="margin: 0 0 5px 0; color: #1a237e;">Thành phố Huế</h3>
+                            <p style="margin: 0; font-size: 14px;">Di sản Văn hóa Thế giới UNESCO</p>
+                            <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">
+                                Cố đô Việt Nam, tỉnh Thừa Thiên Huế
+                            </p>
+                        </div>
+                    `
+                });
+                
+                // Mở info window khi click marker
+                marker.addListener('click', () => {
+                    infoWindow.open(map, marker);
+                });
+                
+                // Tự động mở info window sau 1 giây
+                setTimeout(() => {
+                    infoWindow.open(map, marker);
+                }, 1000);
+                
+                // Đóng info window khi click ra ngoài
+                map.addListener('click', () => {
+                    infoWindow.close();
+                });
+            }
+            
+            // Gọi hàm khởi tạo bản đồ
+            initMap();
+            
+            const postcard = document.querySelector('.postcard');
+            const animateElements = document.querySelectorAll('.animate-on-scroll');
+            
+            // Hiệu ứng khi di chuột vào postcard
+            postcard.addEventListener('mouseenter', function() {
+                this.style.transform = 'rotateY(5deg) rotateX(3deg) scale(1.02)';
+            });
+            
+            postcard.addEventListener('mouseleave', function() {
+                this.style.transform = 'rotateY(0) rotateX(0) scale(1)';
+            });
+            
+            // Hiệu ứng cho các card nhận diện
+            const identifierCards = document.querySelectorAll('.identifier-card');
+            identifierCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+                
+                // Thêm sự kiện touch cho mobile
+                card.addEventListener('touchstart', function() {
+                    this.style.transform = 'translateY(-8px)';
+                });
+                
+                card.addEventListener('touchend', function() {
+                    setTimeout(() => {
+                        this.style.transform = 'translateY(0)';
+                    }, 300);
+                });
+            });
+            
+            // Hiệu ứng scroll cho các phần tử
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+            
+            animateElements.forEach(el => observer.observe(el));
+            
+            // Hiệu ứng cho các dòng trong bảng
+            const tableRows = document.querySelectorAll('table tbody tr');
+            tableRows.forEach((row, index) => {
+                row.style.transitionDelay = `${index * 0.1}s`;
+                
+                row.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateX(8px)';
+                });
+                
+                row.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateX(0)';
+                });
+            });
+            
+            // Thêm fallback cho hình ảnh
+            const images = document.querySelectorAll('img');
+            images.forEach(img => {
+                img.addEventListener('error', function() {
+                    console.log('Hình ảnh không tải được:', this.src);
+                    // Tạo placeholder màu đẹp thay vì hình ảnh bị lỗi
+                    const colors = ['#1a237e', '#283593', '#3949ab', '#5c6bc0'];
+                    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 600;
+                    canvas.height = 400;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Vẽ nền gradient
+                    const gradient = ctx.createLinearGradient(0, 0, 600, 400);
+                    gradient.addColorStop(0, randomColor);
+                    gradient.addColorStop(1, lightenColor(randomColor, 40));
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, 600, 400);
+                    
+                    // Vẽ icon
+                    ctx.fillStyle = 'white';
+                    ctx.font = '60px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('🏛️', 300, 150);
+                    
+                    // Vẽ text
+                    ctx.font = 'bold 24px Arial';
+                    ctx.fillText('Hình ảnh minh họa', 300, 250);
+                    
+                    ctx.font = '18px Arial';
+                    ctx.fillText('Thành phố Huế', 300, 290);
+                    
+                    this.src = canvas.toDataURL();
+                });
+            });
+            
+            // Hàm làm sáng màu
+            function lightenColor(color, percent) {
+                const num = parseInt(color.replace("#", ""), 16);
+                const amt = Math.round(2.55 * percent);
+                const R = (num >> 16) + amt;
+                const G = (num >> 8 & 0x00FF) + amt;
+                const B = (num & 0x0000FF) + amt;
+                
+                return "#" + (
+                    0x1000000 +
+                    (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                    (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                    (B < 255 ? B < 1 ? 0 : B : 255)
+                ).toString(16).slice(1);
+            }
+            
+            // Tối ưu cho mobile: giảm hiệu ứng hover trên mobile
+            if ('ontouchstart' in window) {
+                postcard.style.transform = 'none';
+                postcard.style.transition = 'transform 0.3s ease';
+                
+                // Thay đổi hiệu ứng hover thành tap trên mobile
+                const hoverElements = document.querySelectorAll('.identifier-card, .cultural-value, .table-container');
+                hoverElements.forEach(el => {
+                    el.addEventListener('touchstart', function() {
+                        this.style.transform = 'scale(0.98)';
+                    });
+                    
+                    el.addEventListener('touchend', function() {
+                        setTimeout(() => {
+                            this.style.transform = 'scale(1)';
+                        }, 200);
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
